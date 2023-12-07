@@ -1,0 +1,14 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container team">
+    <h2>Wählen Sie den MVP</h2>
+    <form action="/match-end" method="post">
+        {% for player in players %}
+        <div>
+            <input type="radio" id="{{ player }}" name="mvp" value="{{ player }}">
+            <label for="{{ player }}">{{ player }}</label>
+        </div>
+        {% endfor %}
+        <button type="submit" class="button">MVP Speichern</button>
+    </form>
+</div>
+{% endblock %}

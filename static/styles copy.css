@@ -1,0 +1,87 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 100%;
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+header {
+    background: linear-gradient(45deg, #006d77, #83c5be);
+    color: #fff;
+    padding: 15px;
+    border-bottom: 5px solid #023e8a;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2em;
+}
+
+.team {
+    background: #ffffff;
+    padding: 15px;
+    margin-top: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.team-name input[type="text"] {
+    width: calc(100% - 22px);
+    max-width: 200px;
+    height: 30px;
+    padding: 5px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    color: #333;
+}
+
+.team h2,
+.team h3 {
+    margin: 15px 0;
+    font-size: 1.4em;
+}
+
+.button {
+    display: inline-block;
+    background: linear-gradient(45deg, #48cae4, #00b4d8);
+    color: #fff;
+    padding: 15px 30px;
+    margin: 5px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    border: none;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.button:hover {
+    background: linear-gradient(45deg, #023e8a, #48cae4);
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 1.5em;
+    }
+    .team h2,
+    .team h3 {
+        font-size: 1.2em;
+    }
+    .button {
+        padding: 12px 20px;
+        font-size: 0.9em;
+    }
+}

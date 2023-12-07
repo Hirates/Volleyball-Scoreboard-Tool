@@ -1,0 +1,129 @@
+{% extends 'base.html' %} {% block content %}
+<header>
+    <h1>Kollmann Media Scoreboard</h1>
+</header>
+
+<div class="container">
+    <!-- Team 1 -->
+    <div class="team" id="team1">
+        <!-- Team Name Form -->
+        <div class="team-name">
+            <form action="/update-name/team1" method="post">
+                <input type="text" name="name" value="{{ team1_name }}">
+                <button class="button" type="submit">Update Team 1 Name</button>
+            </form>
+        </div>
+        <!-- Score and Sets Display -->
+        <h2>{{ team1_name }}: <span id="team1_score">{{ team1_score }}</span> (Sätze Gewonnen <span id="team1_sets">{{ team1_sets }}</span>)</h2>
+        <!-- Score Buttons -->
+        <button class="button" onclick="updateScore('team1', 'increment')">Punkt +</button>
+        <button class="button" onclick="updateScore('team1', 'decrement')">Storno -</button>
+        <br/>
+        <button class="button" onclick="updateScore('team1', 'set')">Satz Sieg</button>
+        <button class="button" onclick="updateScore('team1', 'unset')">Set Storno</button>
+        <br/>
+        <button class="button" onclick="triggerSetPoint('team1')">Satzball</button>
+        <button class="button" onclick="triggerMatchPoint('team1')">Matchball</button>
+
+        <!-- Timeout Display and Button -->
+        <h3>Timeouts: <span id="team1_timeout">{{ team1_timeout }}</span></h3>
+        <button class="button" onclick="triggerTimeout('team1')">Auszeit</button>
+        <button class="button" onclick="toggleServe('team1')">Aufschlag Se</button>
+    </div>
+
+    <!-- Team 2 -->
+    <div class="team" id="team2">
+        <!-- Team Name Form -->
+        <div class="team-name">
+            <form action="/update-name/team2" method="post">
+                <input type="text" name="name" value="{{ team2_name }}">
+                <button class="button" type="submit">Update Team 2 Name</button>
+            </form>
+        </div>
+        <!-- Score and Sets Display -->
+        <h2>{{ team2_name }}: <span id="team2_score">{{ team2_score }}</span> (Sätze Gewonnen <span id="team2_sets">{{ team2_sets }}</span>)</h2>
+        <!-- Score Buttons -->
+        <button class="button" onclick="updateScore('team2', 'increment')">Punkt +</button>
+        <button class="button" onclick="updateScore('team2', 'decrement')">Storno -</button>
+        <br/>
+        <button class="button" onclick="updateScore('team2', 'set')">Satz Sieg</button>
+        <button class="button" onclick="updateScore('team2', 'unset')">Set Minus</button>
+        <br/>
+        <button class="button" onclick="triggerSetPoint('team2')">Satzball</button>
+        <button class="button" onclick="triggerMatchPoint('team2')">Matchball</button>
+        <h3>Timeouts: <span id="team2_timeout">{{ team2_timeout }}</span></h3>
+        <button class="button" onclick="triggerTimeout('team2')">Auszeit</button>
+        <button class="button" onclick="toggleServe('team2')">Aufschlag setzen</button>
+        <button class="button" onclick="window.location.href='/match-end'">Match Ende</button>
+    </div>
+    <div class="team" id="team2">
+        <!-- Team Name Form -->
+        <div class="team-name">
+            <form action="/update-name/team2" method="post">
+                <input type="text" name="name" value="{{ team2_name }}">
+                <button class="button" type="submit">Update Team 2 Name</button>
+            </form>
+        </div>
+        <!-- Score and Sets Display -->
+        <h2>{{ team2_name }}: <span id="team2_score">{{ team2_score }}</span> (Sätze Gewonnen <span id="team2_sets">{{ team2_sets }}</span>)</h2>
+        <!-- Score Buttons -->
+        <button class="button" onclick="updateScore('team2', 'increment')">Punkt +</button>
+        <button class="button" onclick="updateScore('team2', 'decrement')">Storno -</button>
+        <br/>
+        <button class="button" onclick="updateScore('team2', 'set')">Satz Sieg</button>
+        <button class="button" onclick="updateScore('team2', 'unset')">Set Minus</button>
+        <br/>
+        <button class="button" onclick="triggerSetPoint('team2')">Satzball</button>
+        <button class="button" onclick="triggerMatchPoint('team2')">Matchball</button>
+        <h3>Timeouts: <span id="team2_timeout">{{ team2_timeout }}</span></h3>
+        <button class="button" onclick="triggerTimeout('team2')">Auszeit</button>
+        <button class="button" onclick="toggleServe('team2')">Aufschlag setzen</button>
+        <button class="button" onclick="window.location.href='/match-end'">Match Ende</button>
+    </div>
+</div>
+{% endblock %}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function updateScore(team, action) {
+        $.post('/update/' + team + '/' + action, function(data) {
+            $('#' + team + '_score').text(data.score);
+            $('#' + team + '_sets').text(data.sets);
+        }).fail(function() {
+            alert('Error: Could not update score');
+        });
+    }
+
+    function toggleServe(team) {
+        $.post('/toggle-serve/' + team, function() {
+            // Optional: Fügen Sie hier Logik hinzu, um die Anzeige zu aktualisieren
+        }).fail(function() {
+            alert('Error: Could not toggle serve');
+        });
+    }
+
+    function triggerTimeout(team) {
+        $.post('/timeout/' + team, function(data) {
+            $('#' + team + '_timeout').text(data.timeout);
+        }).fail(function() {
+            alert('Error: Could not trigger timeout');
+        });
+    }
+
+    function triggerSetPoint(team) {
+        $.post('/setpoint/' + team, function(data) {
+            // Optional: Fügen Sie hier Logik hinzu, um die Anzeige zu aktualisieren
+        }).fail(function() {
+            alert('Error: Could not trigger set point');
+        });
+    }
+
+    function triggerMatchPoint(team) {
+        $.post('/matchpoint/' + team, function(data) {
+            // Optional: Fügen Sie hier Logik hinzu, um die Anzeige zu aktualisieren
+        }).fail(function() {
+            alert('Error: Could not trigger match point');
+        });
+    }
+</script>
+```, team1_score=team1_score, team2_score=team2_score, team1_sets=team1_sets, team2_sets=team2_sets, team1_timeout=team1_timeout, team2_timeout=team2_timeout, team1_name=team1_name, team2_name=team2_name)

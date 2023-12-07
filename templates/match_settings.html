@@ -1,0 +1,16 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container">
+    <h2>Match-Einstellungen</h2>
+    <form action="/match-settings" method="post">
+        <div>
+            <label for="team1_name">Name Team 1:</label>
+            <input type="text" id="team1_name" name="team1_name" value="{{ team1_name }}">
+        </div>
+        <div>
+            <label for="team2_name">Name Team 2:</label>
+            <input type="text" id="team2_name" name="team2_name" value="{{ team2_name }}">
+        </div>
+        <button type="submit" class="button">Namen speichern</button>
+    </form>
+</div>
+{% endblock %}

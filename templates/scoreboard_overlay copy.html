@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Scoreboard Overlay</title>
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            /* Verhindert Scrollbars */
+        }
+        
+        .container {
+            width: 1920px;
+            height: 1080px;
+            margin: 0 auto;
+            /* Zentriert den Container */
+            position: relative;
+            /* Für die absolute Positionierung der inneren Elemente */
+            overflow: hidden;
+            /* Verhindert Scrollbars innerhalb des Containers */
+            background-image: url('/static/score_bug.png');
+            /* Hintergrundbild */
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .scoreboard {
+            position: absolute;
+            color: white;
+            /* Weitere Stilisierungen */
+        }
+        
+        #team1_score,
+        #team1_name,
+        #team2_name,
+        #team1_sets,
+        #team2_sets,
+        #team2_score {
+            position: absolute;
+            /* Anpassung von top und left Werten je nach Bedarf */
+        }
+        
+        #team1_score {
+            top: -475px;
+            left: -546px;
+        }
+        
+        #team2_score {
+            top: -425px;
+            left: -546px;
+        }
+        
+        #team1_name {
+            top: -475px;
+            left: -835px;
+        }
+        
+        #team2_name {
+            top: -425px;
+            left: -835px;
+        }
+        
+        #team1_sets {
+            top: -475px;
+            left: -650px;
+        }
+        
+        #team2_sets {
+            top: -425px;
+            left: -650px;
+        }
+        /* Weitere Stilisierungen */
+        
+        @font-face {
+            font-family: 'Lemour Bold';
+            src: url('/static/fonts/LemourBold.otf') format('opentype');
+        }
+        
+        .scoreboard h1 {
+            font-family: 'Lemour Bold', sans-serif;
+            /* Weitere Stilisierungen */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="scoreboard">
+
+            <h1 id="team1_score">{{ team1_score }}</h1>
+            <h1 id="team2_score">{{ team2_score }}</h1>
+            <h1 id="team1_sets">{{ team2_sets }}</h1>
+            <h1 id="team2_sets">{{ team2_sets }}</h1>
+            <h1 id="team2_name">{{ team2_name }}</h1>
+            <h1 id="team1_name">{{ team1_name }}</h1>
+            <!-- Weitere Elemente -->
+        </div>
+    </div>
+    <script>
+        function refreshScores() {
+            fetch('/get-scores')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('team1_score').textContent = data.team1_score;
+                    document.getElementById('team2_score').textContent = data.team2_score;
+                    document.getElementById('team1_sets').textContent = data.team1_sets; // Sets für Team 1
+                    document.getElementById('team2_sets').textContent = data.team2_sets; // Sets für Team 2
+
+                    // Aktualisieren Sie hier weitere Elemente
+                });
+        }
+
+        // Polling alle 5 Sekunden
+        setInterval(refreshScores, 50);
+    </script>
+</body>
+
+</html>

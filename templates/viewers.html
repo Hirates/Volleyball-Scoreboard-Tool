@@ -1,0 +1,9 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container">
+    <h2>Aktuelle Zuschauerzahl: {{ viewers_count }}</h2>
+    <form action="/viewers" method="post">
+        <input type="text" name="viewers" placeholder="Zuschauerzahl eingeben" value="{{ viewers_count }}" class="input">
+        <button type="submit" class="button">Zuschauerzahl speichern</button>
+    </form>
+</div>
+{% endblock %}

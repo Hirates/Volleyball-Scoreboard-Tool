@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kollmann Media Scoreboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script>
+        // JavaScript-Funktion, um die Uhrzeit zu aktualisieren
+        function updateClock() {
+            var now = new Date();
+            var hours = now.getHours().toString().padStart(2, '0');
+            var minutes = now.getMinutes().toString().padStart(2, '0');
+            var seconds = now.getSeconds().toString().padStart(2, '0');
+            document.getElementById('clock').textContent = hours + ':' + minutes + ':' + seconds;
+        }
+        setInterval(updateClock, 1000); // Aktualisiert die Uhr jede Sekunde
+    </script>
+</head>
+
+<body onload="updateClock()">
+    <header>
+        <h1>Kollmann Media Scoreboard</h1>
+        <div id="clock" style="font-size: large;"></div>
+        <!-- Uhrzeitanzeige -->
+        <!-- Hier können Sie eine Navigationsleiste einfügen, falls benötigt -->
+    </header>
+
+    <main>
+        {% block content %}
+        <!-- Der Hauptinhalt der Seite wird hier durch die anderen Templates eingefügt -->
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>© 2023 Kollmann Media - Alle Rechte vorbehalten</p>
+        <img src="http://192.168.1.181:3001/api/badge/5/status?style=for-the-badge" alt="Server Status">
+    </footer>
+
+    <!-- Hier können Sie weitere JavaScript-Dateien einbinden -->
+</body>
+
+</html>
