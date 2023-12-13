@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <title>MVP Anzeige</title>
+    <style>
+        @font-face {
+            font-family: 'Veneer';
+            src: url('/static/Veneer.ttf') format('truetype');
+        }
+        
+        body {
+            font-family: 'Veneer', sans-serif;
+            background-color: transparent;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .mvp-display {
+            color: #fff;
+            font-size: 100px;
+            text-align: center;
+            opacity: 0;
+            transform: scale(0.5);
+            animation: fadeInScale 1s ease forwards;
+        }
+        
+        @keyframes fadeInScale {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mvp-display">
+        Der aktuelle MVP ist: {{ mvp_name }}
+    </div>
+
+    <script>
+        function refreshMVP() {
+            fetch('/mvp')
+                .then(response => response.json())
+                .then(data => {
+                    document.querySelector('.mvp-display').textContent = 'MVP: ' + data.mvp_name;
+                });
+        }
+
+        setInterval(refreshMVP, 5000);
+    </script>
+</body>
+
+</html>

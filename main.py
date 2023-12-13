@@ -31,26 +31,62 @@ def update_score(team, action):
     other_team_score = int(read_value(other_team_score_filename, "0"))
     sets = int(read_value(sets_filename, "0"))
 
+    set_point = False  # Flag für Satzball
+    match_point = False  # Flag für Matchball
+
     if action == 'increment':
         score += 1
         write_value(serving_team_filename, '.')  
         write_value(other_serving_team_filename, '')  
+
+        # Überprüfen auf Satzball
+        if score >= 24 and (score - other_team_score) >= 1:
+            set_point = True
+            try:
+                companion_url = "http://127.0.0.1:8888/press/bank/4/10" if team == 'team1' else "http://127.0.0.1:8888/press/bank/4/12"
+                requests.get(companion_url)
+            except requests.RequestException as e:
+                print(f"Fehler beim Senden der Anfrage an Bitfocus Companion für Satzball: {e}")
+
         # Überprüfen, ob der aktuelle Punktestand einen Satzgewinn bedeutet
-        if score >= 25 and score - other_team_score >= 2:
+        if score >= 25 and (score - other_team_score) >= 2:
             sets += 1
             score = 0
             other_team_score = 0
             write_value(sets_filename, sets)
+            set_point = False  # Zurücksetzen des Satzball-Flags
+
+            # Überprüfen auf Matchball
+            if sets == 2:  # Annahme: Best of 5 Spiele
+                match_point = True
+                try:
+                    companion_url = "http://127.0.0.1:8888/press/bank/4/18" if team == 'team1' else "http://127.0.0.1:8888/press/bank/4/20"
+                    requests.get(companion_url)
+                except requests.RequestException as e:
+                    print(f"Fehler beim Senden der Anfrage an Bitfocus Companion für Matchball: {e}")
+
+            # Wechselt den Aufschlag nach dem Satzgewinn
+            initial_serve = read_value('initial_serve.txt', 'team1')
+            if initial_serve == 'team1':
+                new_serve = 'team2' if sets % 2 == 1 else 'team1'
+            else:
+                new_serve = 'team1' if sets % 2 == 1 else 'team2'
+
+            write_value('team1_serve.txt', '.' if new_serve == 'team1' else '')
+            write_value('team2_serve.txt', '.' if new_serve == 'team2' else '')
 
     elif action == 'decrement' and score > 0:
         score -= 1
+        # Entfernen des Satzball-Status und Matchball-Status, falls nötig
+        if score < 24 or (score - other_team_score) < 1:
+            set_point = False
+            match_point = False
 
     write_value(score_filename, score)
     write_value(other_team_score_filename, other_team_score)
-    return jsonify(score=score, sets=sets, other_team_score=other_team_score)
 
-
-
+    # Rückgabe der aktualisierten Werte und der Status für Satzball und Matchball
+    return jsonify(score=score, sets=sets, other_team_score=other_team_score, set_point=set_point, match_point=match_point)
 
 @app.route('/mvp-confirm', methods=['GET', 'POST'])
 def mvp_confirm():
@@ -133,6 +169,25 @@ def timeout(team):
 
     return jsonify(timeout=timeout_count)
 
+@app.route('/mvp')
+def mvp():
+    mvp_name = read_value('mvp.txt', "Unbekannter Spieler")
+    return render_template('mvp.html', mvp_name=mvp_name)
+
+def read_value(file_path, default_value):
+    try:
+        with open(file_path, 'r') as file:
+            return file.read().strip()
+    except FileNotFoundError:
+        return default_value
+
+
+@app.route('/zuschauer')
+def zuschauer():
+    viewers_count = read_value('viewers_count.txt', "0")
+    return render_template('zuschauer.html', viewers_count=viewers_count)
+
+
 @app.route('/match-end', methods=['GET', 'POST'])
 def match_end():
     if request.method == 'POST':
@@ -149,13 +204,34 @@ def match_settings():
     if request.method == 'POST':
         team1_name = request.form.get('team1_name', '')
         team2_name = request.form.get('team2_name', '')
+        serving_team = request.form.get('serving_team', 'team1')
+
+        initial_serve = request.form.get('serving_team', 'team1')
+        write_value('initial_serve.txt', initial_serve)
+
         write_value('team1_name.txt', team1_name)
         write_value('team2_name.txt', team2_name)
+
+        if serving_team == 'team1':
+            write_value('team1_serve.txt', '.')
+            write_value('team2_serve.txt', '')
+        else:
+            write_value('team1_serve.txt', '')
+            write_value('team2_serve.txt', '.')
+        
+        if initial_serve == 'team1':
+            write_value('team1_serve.txt', '.')
+            write_value('team2_serve.txt', '')
+        else:
+            write_value('team1_serve.txt', '')
+            write_value('team2_serve.txt', '.')
+
         return redirect(url_for('index'))
 
     team1_name = read_value('team1_name.txt', "Team 1")
     team2_name = read_value('team2_name.txt', "Team 2")
     return render_template('match_settings.html', team1_name=team1_name, team2_name=team2_name)
+
 
 @app.route('/toggle-serve/<team>', methods=['POST'])
 def toggle_serve(team):
@@ -247,9 +323,7 @@ def index():
                 <!-- Score Buttons -->
                 <button class="button" onclick="updateScore('team1', 'increment')">Punkt +</button>
                 <button class="button" onclick="updateScore('team1', 'decrement')">Storno -</button>
-                <br/>
-                <button class="button" onclick="updateScore('team1', 'set')">Satz Sieg</button>
-                <button class="button" onclick="updateScore('team1', 'unset')">Set Storno</button>
+
                 <br/>
                 <button class="button" onclick="triggerSetPoint('team1')">Satzball</button>
                 <button class="button" onclick="triggerMatchPoint('team1')">Matchball</button>
@@ -257,7 +331,6 @@ def index():
                 <!-- Timeout Display and Button -->
                 <h3>Timeouts: <span id="team1_timeout">{{ team1_timeout }}</span></h3>
                 <button class="button" onclick="triggerTimeout('team1')">Auszeit</button>
-                <button class="button" onclick="toggleServe('team1')">Aufschlag Se</button>
             </div>
 
             <!-- Team 2 -->
@@ -269,14 +342,11 @@ def index():
                 <button class="button" onclick="updateScore('team2', 'increment')">Punkt +</button>
                 <button class="button" onclick="updateScore('team2', 'decrement')">Storno -</button>
                 <br/>
-                <button class="button" onclick="updateScore('team2', 'set')">Satz Sieg</button>
-                <button class="button" onclick="updateScore('team2', 'unset')">Set Minus</button>
-                <br/>
                 <button class="button" onclick="triggerSetPoint('team2')">Satzball</button>
                 <button class="button" onclick="triggerMatchPoint('team2')">Matchball</button>
                 <h3>Timeouts: <span id="team2_timeout">{{ team2_timeout }}</span></h3>
                 <button class="button" onclick="triggerTimeout('team2')">Auszeit</button>
-                <button class="button" onclick="toggleServe('team2')">Aufschlag setzen</button>
+
 
             </div>
             <div class="container">
@@ -341,6 +411,21 @@ def index():
                 alert('Error: Could not perform match control action');
             });
         }
+    function updateScore(team, action) {
+    $.post('/update/' + team + '/' + action, function(data) {
+        $('#' + team + '_score').text(data.score);
+        $('#' + team + '_sets').text(data.sets);
+        if (data.set_point) {
+            // Anzeigen der Satzball-Benachrichtigung
+            alert(team + ' hat Satzball!');
+                // if (data.match_point) {
+        //     alert(team + ' hat Matchball!');
+        }
+    }).fail(function() {
+        alert('Error: Could not update score');
+    });
+}
+
     </script>
     ''', team1_score=team1_score, team2_score=team2_score, team1_sets=team1_sets, team2_sets=team2_sets, team1_timeout=team1_timeout, team2_timeout=team2_timeout, team1_name=team1_name, team2_name=team2_name)
 

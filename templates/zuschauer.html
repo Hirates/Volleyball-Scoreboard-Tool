@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Zuschauerzahlen</title>
+    <style>
+        @font-face {
+            font-family: 'Veneer';
+            src: url('/static/Veneer.ttf') format('truetype');
+        }
+        
+        body {
+            font-family: 'Veneer', sans-serif;
+            background-color: transparent;
+            /* Transparenter Hintergrund für OBS */
+            margin: 0;
+            padding: 0;
+        }
+        
+        .viewer-count {
+            color: #fff;
+            /* Weißer Text für bessere Sichtbarkeit in OBS */
+            font-size: 100px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="viewer-count">
+        Wir bedanken uns bei {{ viewers_count }} Zuschauern!
+    </div>
+
+    <script>
+        function refreshViewers() {
+            fetch('/zuschauer')
+                .then(response => response.json())
+                .then(data => {
+                    document.querySelector('.viewer-count').textContent = 'Zuschauer: ' + data.viewers_count;
+                });
+        }
+
+        // Aktualisiert die Zuschauerzahl alle 5 Sekunden
+        setInterval(refreshViewers, 5000);
+    </script>
+</body>
+
+</html>

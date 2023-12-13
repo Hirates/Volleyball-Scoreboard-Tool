@@ -76,11 +76,31 @@
             top: -425px;
             left: -600px;
         }
+        
+        #team1_serve_status,
+        #team2_serve_status {
+            position: absolute;
+            /* Anpassung von top und left Werten je nach Bedarf */
+        }
+        
+        #team1_serve_status {
+            top: -475px;
+            /* Beispielwert */
+            left: -650px;
+            /* Beispielwert */
+        }
+        
+        #team2_serve_status {
+            top: -425px;
+            /* Beispielwert */
+            left: -650px;
+            /* Beispielwert */
+        }
         /* Weitere Stilisierungen */
         
         @font-face {
             font-family: 'Lemour Bold';
-            src: url('/static/fonts/LemourBold.otf') format('opentype');
+            src: url('/static/LemourBold.otf') format('opentype');
         }
         
         .scoreboard h1 {
@@ -100,8 +120,11 @@
             <h1 id="team2_sets">{{ team2_sets }}</h1>
             <h1 id="team2_name">{{ team2_name }}</h1>
             <h1 id="team1_name">{{ team1_name }}</h1>
-            <h1 id="team1_serve">{{ team1_serve }}</h1>
-            <h1 id="team2_serve">{{ team2_serve }}</h1>
+            <img id="team1_timeout_image" src="/static/TO_Oben.png" style="display: none;">
+            <img id="team2_timeout_image" src="/static/TO_Unten.png" style="display: none;">
+            <h1 id="team1_serve_status">{{ team1_serve }}</h1>
+            <h1 id="team2_serve_status">{{ team2_serve }}</h1>
+
             <!-- Weitere Elemente -->
         </div>
     </div>
@@ -116,13 +139,32 @@
                     document.getElementById('team2_sets').textContent = data.team2_sets;
                     document.getElementById('team1_name').textContent = data.team1_name; // Team 1 Name
                     document.getElementById('team2_name').textContent = data.team2_name; // Team 2 Name
-                    document.getElementById('team1_serve').textContent = data.team1_serve; // Team 1 Aufschlag
-                    document.getElementById('team2_serve').textContent = data.team2_serve; // Team 2 Aufschlag
+
+                });
+            fetch('/get-serve-status')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('team1_serve_status').textContent = data.team1_serve;
+                    document.getElementById('team2_serve_status').textContent = data.team2_serve;
                 });
         }
 
+        function triggerTimeout(team) {
+            $.post('/timeout/' + team, function(data) {
+                if (data.show_timeout_image) {
+                    let timeoutImageId = (team === 'team1') ? 'team1_timeout_image' : 'team2_timeout_image';
+                    let timeoutImageElement = document.getElementById(timeoutImageId);
+                    timeoutImageElement.style.display = 'block'; // Bild anzeigen
 
-
+                    setTimeout(() => {
+                        timeoutImageElement.style.display = 'none'; // Bild nach 30 Sekunden ausblenden
+                    }, 30000); // 30 Sekunden
+                }
+                $('#' + team + '_timeout').text(data.timeout);
+            }).fail(function() {
+                alert('Error: Could not trigger timeout');
+            });
+        }
         // Polling alle 5 Sekunden
         setInterval(refreshScores, 50);
     </script>

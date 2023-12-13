@@ -119,6 +119,7 @@ def timeout(team):
     timeout_count = int(read_value(timeout_filename, "0"))
     timeout_count += 1
     write_value(timeout_filename, timeout_count)
+    
 
     try:
         # URL für Bitfocus Companion je nach Team
@@ -131,7 +132,7 @@ def timeout(team):
     except requests.RequestException as e:
         print(f"Fehler beim Senden der Anfrage an Bitfocus Companion: {e}")
 
-    return jsonify(timeout=timeout_count)
+    return jsonify(timeout=timeout_count, show_timeout_image=True)
 
 @app.route('/match-end', methods=['GET', 'POST'])
 def match_end():
@@ -183,7 +184,6 @@ def viewers():
 
 # Stellen Sie sicher, dass die Funktionen write_value und read_value, wie bereits definiert, vorhanden sind
 @app.route('/get-scores')
-@app.route('/get-scores')
 def get_scores():
     team1_score = read_value('team1_score.txt', "0")
     team2_score = read_value('team2_score.txt', "0")
@@ -191,10 +191,17 @@ def get_scores():
     team2_sets = read_value('team2_sets.txt', "0")
     team1_name = read_value('team1_name.txt', "Team 1")
     team2_name = read_value('team2_name.txt', "Team 2")
+    team2_serve = read_value('team2_serve.txt', "Team 2")
+    team1_serve = read_value('team1_serve.txt', "Team 1")
     return jsonify(team1_score=team1_score, team2_score=team2_score, 
                    team1_sets=team1_sets, team2_sets=team2_sets, 
-                   team1_name=team1_name, team2_name=team2_name)
+                   team1_name=team1_name, team2_name=team2_name, team2_serve=team2_serve, team1_serve=team1_serve)
+                    
 
+@app.route('/zuschauer')
+def zuschauer():
+    viewers_count = read_value('viewers_count.txt', "0")
+    return render_template('zuschauer.html', viewers_count=viewers_count)
 
 @app.route('/scoreboard-overlay')
 def scoreboard_overlay():
@@ -204,7 +211,9 @@ def scoreboard_overlay():
     team2_sets = read_value('team2_sets.txt', "0")
     team1_name = read_value('team1_name.txt', "Team 1")
     team2_name = read_value('team2_name.txt', "Team 2")
-    return render_template('scoreboard_overlay.html', team1_score=team1_score, team2_score=team2_score, team1_sets=team1_sets, team2_sets=team2_sets, team1_name=team1_name, team2_name=team2_name)
+    team2_serve = read_value('team2_serve.txt', "Team 2")
+    team1_serve = read_value('team1_serve.txt', "Team 1")
+    return render_template('scoreboard_overlay.html', team1_score=team1_score, team2_score=team2_score, team1_sets=team1_sets, team2_sets=team2_sets, team1_name=team1_name, team2_name=team2_name, team2_serve=team2_serve, team1_serve=team1_serve)
 
 
 

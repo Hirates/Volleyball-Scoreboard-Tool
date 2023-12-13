@@ -10,7 +10,15 @@
             <label for="team2_name">Name Team 2:</label>
             <input type="text" id="team2_name" name="team2_name" value="{{ team2_name }}">
         </div>
+        <div>
+            <label for="serving_team">Aufschlagendes Team:</label>
+            <select id="serving_team" name="serving_team">
+                <option value="team1">Team 1</option>
+                <option value="team2">Team 2</option>
+            </select>
+        </div>
         <button type="submit" class="button">Namen speichern</button>
     </form>
 </div>
+
 {% endblock %}

@@ -17,10 +17,10 @@ body {
 }
 
 header {
-    background: linear-gradient(45deg, #006d77, #83c5be);
+    background: linear-gradient(45deg, #2f5d62, #4c7a74);
     color: #fff;
     padding: 15px;
-    border-bottom: 5px solid #023e8a;
+    border-bottom: 5px solid #1b4332;
 }
 
 header h1 {
@@ -55,7 +55,7 @@ header h1 {
 
 .button {
     display: inline-block;
-    background: linear-gradient(45deg, #48cae4, #00b4d8);
+    background: linear-gradient(45deg, #3fa34d, #5fae57);
     color: #fff;
     padding: 15px 30px;
     margin: 5px;
@@ -67,7 +67,7 @@ header h1 {
 }
 
 .button:hover {
-    background: linear-gradient(45deg, #023e8a, #48cae4);
+    background: linear-gradient(45deg, #1b4332, #3fa34d);
     transform: scale(1.05);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
